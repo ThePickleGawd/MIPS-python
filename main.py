@@ -1,4 +1,5 @@
 import numpy as np
+from decode import decode
 
 
 """
@@ -22,3 +23,4 @@ PC = np.uint32(0) # Program counter
 RF = np.zeros(32, dtype=np.uint32) # Register File
 IMEM = [] # Instruction Memory
 DMEM = [] # Data Memory
+
