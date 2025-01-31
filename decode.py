@@ -1,12 +1,36 @@
+import numpy as np
+from typing import Optional, TypedDict
 
+class InstructionData(TypedDict):
+    instr_type: str
+    opcode: np.uint8  # 6 bits
+    rs: Optional[np.uint8]  # 5 bits
+    rt: Optional[np.uint8]  # 5 bits
+    rd: Optional[np.uint8]  # 5 bits
+    shamt: Optional[np.uint8]  # 5 bits
+    funct: Optional[np.uint8]  # 6 bits
+    immediate: Optional[np.uint16]  # 16 bits
+    address: Optional[np.uint32]  # 26 bits
 
+OP_TO_INSTRUCTION = {
+    """
+    TODO:
+    OP_CODE: { "func": function, "type": type } # add
+    OP_CODE: { "func": function, "type": type } # addi
+    ...
+    """
+}
+
+R_TYPES = ["add", "addu", "sub", "subu", "and", "or", "xor", "nor", "sll", "srl", "sra", "slt", "sltu", "jr"]
+I_TYPES = ["addi", "addiu", "andi", "ori", "xori", "beq", "bne", "slti", "lw", "sw"]
+J_TYPES = ["j"]
 
 def get_instr_type(opcode):
     print("Assuming Instruction is I type")
     return "I"
 
-def decode(instr):
-    data = {
+def decode(instr: np.uint32) -> InstructionData:
+    data: InstructionData = {
         "instr_type": "J", 
         "opcode": None,
         "rs": None,

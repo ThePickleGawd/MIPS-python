@@ -24,3 +24,12 @@ RF = np.zeros(32, dtype=np.uint32) # Register File
 IMEM = [] # Instruction Memory
 DMEM = [] # Data Memory
 
+while (PC >> 2) < len(IMEM):
+    # Fetch
+    instr = ""
+
+    # Decode
+    data = decode(instr=instr)
+
+    # Execute
+    # TODO:
