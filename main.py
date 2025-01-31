@@ -1,5 +1,6 @@
 import numpy as np
 from decode import decode
+from cpu import cpu
 
 
 """
@@ -18,18 +19,12 @@ While PC < len(arr)
 
 """
 
-
-PC = np.uint32(0) # Program counter
-RF = np.zeros(32, dtype=np.uint32) # Register File
-IMEM = [] # Instruction Memory
-DMEM = [] # Data Memory
-
-while (PC >> 2) < len(IMEM):
+while not cpu.finished():
     # Fetch
-    instr = ""
+    instr = np.uint32(0x014B4820)
 
     # Decode
     data = decode(instr=instr)
 
     # Execute
-    # TODO:
+    

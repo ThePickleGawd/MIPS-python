@@ -12,21 +12,17 @@ class InstructionData(TypedDict):
     immediate: Optional[np.uint16]  # 16 bits
     address: Optional[np.uint32]  # 26 bits
 
-OP_TO_INSTRUCTION = {
-    """
-    TODO:
-    OP_CODE: { "func": function, "type": type } # add
-    OP_CODE: { "func": function, "type": type } # addi
-    ...
-    """
-}
-
-R_TYPES = ["add", "addu", "sub", "subu", "and", "or", "xor", "nor", "sll", "srl", "sra", "slt", "sltu", "jr"]
-I_TYPES = ["addi", "addiu", "andi", "ori", "xori", "beq", "bne", "slti", "lw", "sw"]
-J_TYPES = ["j"]
-
 def get_instr_type(opcode):
-    print("Assuming Instruction is I type")
+    # Check if opcode == 0, then it's R type
+    # Check if opcode == 0x02, then it's J type
+    # Otherwise, it's I type
+
+    if opcode == 0x00:
+        return "R"
+    
+    if opcode == 0x02:
+        return "J"
+
     return "I"
 
 def decode(instr: np.uint32) -> InstructionData:
