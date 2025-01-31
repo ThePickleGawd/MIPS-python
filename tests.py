@@ -1,5 +1,7 @@
 import numpy as np
+import functions
 from decode import decode, print_decoded_instr
+from cpu import cpu
 
 
 def test_decode():
@@ -8,7 +10,7 @@ def test_decode():
     Binary: 00000001010010110100100000100000
     Hex: 0x014B4820
     """
-    add = np.uint32(0x2062FFFF)
+    add = np.uint32(0x014B4820)
     add_data = decode(add)
     print("====== add =====")
     print_decoded_instr(data=add_data)
@@ -33,4 +35,12 @@ def test_decode():
     print("====== j =====")
     print_decoded_instr(data=jump_data)
 
-test_decode()
+def test_add():
+    cpu.RF[7] = 0x00000000
+    cpu.RF[8] = 0xFFFFFFFF
+    cpu.RF[9] = 0x00000003
+    functions.add({"rd": 7, "rs": 8, "rt": 9})
+    print(format(cpu.RF[7], "08x"))
+
+# test_decode()
+test_add()

@@ -64,8 +64,8 @@ def decode(instr: np.uint32) -> InstructionData:
 
     return data
 
-def print_decoded_instr(data):
-    print("opcode:   ", format(data["opcode"], "06b"))  # 6-bit opcode
+def print_decoded_instr(data: InstructionData):
+    print("opcode:   ", format(data["opcode"], "06b"), "type: ", data["instr_type"])  # 6-bit opcode
 
     if data["instr_type"] == "J":
         print("address:  ", format(data["address"], "026b"))  # 26-bit address

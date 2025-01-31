@@ -8,8 +8,7 @@ from cpu import cpu
 
 def add(data: InstructionData):
     # R[rd] = R[rs] + R[rt]
-
-    pass
+    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] + cpu.RF[data["rt"]]
 
 def addu(data: InstructionData): pass
 
