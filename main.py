@@ -1,6 +1,7 @@
 import numpy as np
 from decode import decode
 from cpu import cpu
+from functions import execute
 
 
 """
@@ -21,10 +22,10 @@ While PC < len(arr)
 
 while not cpu.finished():
     # Fetch
-    instr = np.uint32(0x014B4820)
+    instr = cpu.fetch()
 
     # Decode
     data = decode(instr=instr)
 
     # Execute
-    
+    execute(data=data)

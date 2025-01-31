@@ -1,4 +1,5 @@
 import numpy as np
+from decode import InstructionData
 
 class CPUState():
     def __init__(self):
@@ -12,6 +13,10 @@ class CPUState():
     
     def finished(self):
         return False
+    
+    def fetch(self):
+        # TODO: self.IMEM[PC]
+        return np.uint32(0x014B4820)
     
 
 cpu = CPUState()

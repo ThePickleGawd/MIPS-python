@@ -89,6 +89,15 @@ OP_TO_I_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {
     0x2b: sw,    # sw
 }
 
+def execute(data: InstructionData):
+    if data["instr_type"] == "R":
+        FUNCT_TO_R_TYPE[data["funct"]]()
+    elif data["instr_type"] == "I":
+        OP_TO_I_TYPE[data["opcode"]]()
+    else:
+        # TODO: Jump PC to data["immediate"]
+        pass
+
 R_TYPES = ["add", "addu", "sub", "subu", "and", "or", "xor", "nor", "sll", "srl", "sra", "slt", "sltu", "jr"]
 I_TYPES = ["addi", "addiu", "andi", "ori", "xori", "beq", "bne", "slti", "lw", "sw"]
 J_TYPES = ["j"]
