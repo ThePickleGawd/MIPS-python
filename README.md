@@ -1,6 +1,6 @@
 ## MIPS Assembly Interpreter in Python
 
-My CCS 1B project. Takes hex assembly instructions for MIPS and will emulate them with Python.
+The first project for CCS 1B: Computer Programming and Organization. Takes hex assembly instructions for MIPS and will emulate them with Python.
 
 ### Requirements
 
