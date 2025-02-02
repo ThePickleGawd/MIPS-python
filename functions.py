@@ -38,7 +38,8 @@ def jr(data: InstructionData): pass
 
 # I types
 
-def addi(data: InstructionData): pass
+def addi(data: InstructionData):
+    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] + data["immediate"]
 
 def addiu(data: InstructionData): pass
 
@@ -91,9 +92,9 @@ OP_TO_I_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {
 
 def execute(data: InstructionData):
     if data["instr_type"] == "R":
-        FUNCT_TO_R_TYPE[data["funct"]]()
+        FUNCT_TO_R_TYPE[data["funct"]](data=data)
     elif data["instr_type"] == "I":
-        OP_TO_I_TYPE[data["opcode"]]()
+        OP_TO_I_TYPE[data["opcode"]](data=data)
     else:
         # TODO: Jump PC to data["immediate"]
         pass

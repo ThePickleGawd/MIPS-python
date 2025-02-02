@@ -60,7 +60,7 @@ def decode(instr: np.uint32) -> InstructionData:
         # 0-5: funct
         data["rd"] = (instr >> 11) & 0x1F
         data["shamt"] = (instr >> 6) & 0x1F
-        data["funct"] = instr & 0x1F
+        data["funct"] = instr & 0x3F
 
     return data
 

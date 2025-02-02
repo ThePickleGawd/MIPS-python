@@ -42,5 +42,5 @@ def test_add():
     functions.add({"rd": 7, "rs": 8, "rt": 9})
     print(format(cpu.RF[7], "08x"))
 
-# test_decode()
-test_add()
+test_decode()
+# test_add()
