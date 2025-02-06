@@ -8,42 +8,77 @@ from cpu import cpu
 
 def add(data: InstructionData):
     # R[rd] = R[rs] + R[rt]
+    # TODO: Trap on overflow??
     cpu.RF[data["rd"]] = cpu.RF[data["rs"]] + cpu.RF[data["rt"]]
 
-def addu(data: InstructionData): pass
+def addu(data: InstructionData):
+    # R[rd] = R[rs] + R[rt]
+    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] + cpu.RF[data["rt"]]
 
-def sub(data: InstructionData): pass
+def sub(data: InstructionData):
+    # R[rd] = R[rs] - R[rt]
+    # TODO: Trap on overflow??
+    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] - cpu.RF[data["rt"]]
 
-def subu(data: InstructionData): pass
+def subu(data: InstructionData):
+    # R[rd] = R[rs] - R[rt]
+    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] - cpu.RF[data["rt"]]
 
-def and_(data: InstructionData): pass
+def and_(data: InstructionData):
+    # R[rd] = R[rs] & R[rt]
+    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] & cpu.RF[data["rt"]]
 
-def or_(data: InstructionData): pass
+def or_(data: InstructionData):
+    # R[rd] = R[rs] | R[rt]
+    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] | cpu.RF[data["rt"]]
 
-def xor(data: InstructionData): pass
+def xor(data: InstructionData):
+    # R[rd] = R[rs] ^ R[rt]
+    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] ^ cpu.RF[data["rt"]]
+    
+def nor(data: InstructionData):
+    # R[rd] = ~(R[rs] | R[rt])
+    cpu.RF[data["rd"]] = ~(cpu.RF[data["rs"]] | cpu.RF[data["rt"]])
 
-def nor(data: InstructionData): pass
+def sll(data: InstructionData):
+    # R[rd] = R[rt] << shamt
+    cpu.RF[data["rd"]] = cpu.RF[data["rt"]] << data["shamt"]
 
-def sll(data: InstructionData): pass
+def srl(data: InstructionData):
+    # R[rd] = R[rt] >> shamt
+    cpu.RF[data["rd"]] = (cpu.RF[data["rt"]] >> data["shamt"])
 
-def srl(data: InstructionData): pass
+def sra(data: InstructionData):
+    # R[rd] = R[rt] >> shamt (keep original sign)
+    sign_bit = (cpu.RF[data["rt"]] >> 31) & 1
+    cpu.RF[data["rd"]] = (cpu.RF[data["rt"]] >> data["shamt"]) & (sign_bit << 31)
 
-def sra(data: InstructionData): pass
+def slt(data: InstructionData):
+    # R[rd] = (R[rs] < R[rt]) ? 1 : 0
+    signed_rs = cpu.RF[data["rs"]].astype(np.int32)
+    signed_rt = cpu.RF[data["rt"]].astype(np.int32)
 
-def slt(data: InstructionData): pass
+    cpu.RF[data["rd"]] = 1 if (signed_rs < signed_rt) else 0
 
-def sltu(data: InstructionData): pass
+def sltu(data: InstructionData):
+    # R[rd] = (R[rs] < R[rt]) ? 1 : 0
+    cpu.RF[data["rd"]] = 1 if (cpu.RF[data["rs"]] < cpu.RF[data["rt"]]) else 0
 
 def jr(data: InstructionData): pass
 
 # I types
 
 def addi(data: InstructionData):
+    # R[rt] = R[rs] + SignExtImm
+    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] + data["immediate"].astype(np.int16)
+
+def addiu(data: InstructionData):
+    # R[rt] = R[rs] + SignExtImm
     cpu.RF[data["rt"]] = cpu.RF[data["rs"]] + data["immediate"]
 
-def addiu(data: InstructionData): pass
-
-def andi(data: InstructionData): pass
+def andi(data: InstructionData):
+    # R[rt] = R[rs] & ZeroExtImm
+    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] & data["immediate"]
 
 def ori(data: InstructionData): pass
 
