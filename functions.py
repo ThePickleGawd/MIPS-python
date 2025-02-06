@@ -3,12 +3,11 @@ import numpy as np
 from decode import InstructionData
 from cpu import cpu
 
-
 # R types
 
 def add(data: InstructionData):
     # R[rd] = R[rs] + R[rt]
-    # TODO: Trap on overflow??
+    # TODO: Trap on overflow?? (Check if negative or positive overflow)
     cpu.RF[data["rd"]] = cpu.RF[data["rs"]] + cpu.RF[data["rt"]]
 
 def addu(data: InstructionData):

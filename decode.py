@@ -20,7 +20,7 @@ def get_instr_type(opcode):
     if opcode == 0x00:
         return "R"
     
-    if opcode == 0x02:
+    if opcode == 0x02 or opcode == 0x03:
         return "J"
 
     return "I"

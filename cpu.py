@@ -9,6 +9,8 @@ class CPUState():
         self.DMEM = np.zeros(32, dtype=np.uint32) # Data Memory
 
     def load_data(self):
+        # spim -assemble [file]
+
         instructions = [
             0x014B4820, # add $t1 $t2 $t3
             0x2062FFFF, # addi $v0 $v1 0xffff 
