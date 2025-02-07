@@ -65,6 +65,29 @@ def sltu(data: InstructionData):
 
 def jr(data: InstructionData): pass
 
+def syscall(data): 
+    v0 = cpu.RF[2]
+    a0 = cpu.RF[4]
+    
+    match v0:
+        case 1:
+            print(a0)
+            return
+
+        case 4:
+            # Print string
+            # TODO: a0 is the mem addr; string concat until null
+            return
+
+        case 5:
+            cpu.RF[2] = input()
+            return
+
+        case 10:
+            # Hack that may work??
+            cpu.finished = lambda: True
+            return
+
 # I types
 
 def addi(data: InstructionData):
@@ -79,9 +102,13 @@ def andi(data: InstructionData):
     # R[rt] = R[rs] & ZeroExtImm
     cpu.RF[data["rt"]] = cpu.RF[data["rs"]] & data["immediate"]
 
-def ori(data: InstructionData): pass
+def ori(data: InstructionData):
+    # R[rt] = R[rs] | ZeroExtImm
+    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] | data["immediate"]
 
-def xori(data: InstructionData): pass
+def xori(data: InstructionData):
+    # R[rt] = R[rs] ^ ZeroExtImm
+    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] ^ data["immediate"]
 
 def beq(data: InstructionData): pass
 
@@ -95,20 +122,21 @@ def sw(data: InstructionData): pass
 
 
 FUNCT_TO_R_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {
-    0x20: add,   # add
-    0x21: addu,  # addu
-    0x22: sub,   # sub
-    0x23: subu,  # subu
-    0x24: and_,  # and
-    0x25: or_,   # or
-    0x26: xor,   # xor
-    0x27: nor,   # nor
-    0x00: sll,   # sll
-    0x02: srl,   # srl
-    0x03: sra,   # sra
-    0x2a: slt,   # slt
-    0x2b: sltu,  # sltu
-    0x08: jr,    # jr
+    0x20: add,    # add
+    0x21: addu,   # addu
+    0x22: sub,    # sub
+    0x23: subu,   # subu
+    0x24: and_,   # and
+    0x25: or_,    # or
+    0x26: xor,    # xor
+    0x27: nor,    # nor
+    0x00: sll,    # sll
+    0x02: srl,    # srl
+    0x03: sra,    # sra
+    0x2a: slt,    # slt
+    0x2b: sltu,   # sltu
+    0x08: jr,     # jr
+    0x0c: syscall # syscall
 }
 
 OP_TO_I_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {

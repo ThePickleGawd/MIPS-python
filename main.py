@@ -30,6 +30,3 @@ while not cpu.finished():
 
     # Execute
     execute(data=data)
-
-# Print final cpu state
-print("Final Register State", cpu.RF)

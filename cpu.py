@@ -41,12 +41,25 @@ class CPUState():
         return self.PC >> 2
     
     def finished(self):
-        return self.IMEM[self.pc_idx()] == 0
+        return self.pc_idx() >= len(self.IMEM)
     
     def fetch(self):
         idx = self.pc_idx()
+        instr = self.IMEM[idx]
         self.PC += 4
-        return self.IMEM[idx]
+        return instr
+    
+    def print_registers(self):    
+        register_names = [
+            "$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3",
+            "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7",
+            "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7",
+            "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"
+        ]
+
+        for i, name in enumerate(register_names):
+            print(f"{name}: {self.RF[i]}")
+
     
 
 cpu = CPUState()
