@@ -8,8 +8,16 @@ class CPUState():
         self.IMEM = np.zeros(32, dtype=np.uint32) # Instruction Memory
         self.DMEM = np.zeros(32, dtype=np.uint32) # Data Memory
 
-    def load_data(self):
+    def load_data(self, file):
         # spim -assemble [file]
+
+        with open(file, 'r') as f:
+            # Format:
+            # .text # hexStart hexEnd
+            # .word [comma separated hex instructions]
+            # .data # hexStart hexEnd
+            # .word [comma separated hex data]
+            pass
 
         instructions = [
             0x014B4820, # add $t1 $t2 $t3

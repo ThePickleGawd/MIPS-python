@@ -20,7 +20,7 @@ While PC < len(arr)
 
 """
 
-cpu.load_data()
+cpu.load_data("input/simpleAdd.asm")
 
 while not cpu.finished():
     # Fetch
