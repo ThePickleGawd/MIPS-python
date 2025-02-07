@@ -5,8 +5,8 @@ class CPUState():
     def __init__(self):
         self.PC = np.uint32(0) # Program counter
         self.RF = np.zeros(32, dtype=np.uint32) # Register File
-        self.IMEM = np.zeros(32, dtype=np.uint32) # Instruction Memory
-        self.DMEM = np.zeros(32, dtype=np.uint32) # Data Memory
+        self.IMEM = np.zeros(0, dtype=np.uint32) # Instruction Memory
+        self.DMEM = np.zeros(0, dtype=np.uint32) # Data Memory
 
     def load_data(self, file):
         # spim -assemble [file]
@@ -22,19 +22,20 @@ class CPUState():
             line3 = f.readline()
             line4 = f.readline()
 
+            # Get hex range for instructions
             line1Arr = line1.split()
-            instrHexStart, instrHexEnd = line1Arr[2], line1Arr[4]
+            instrHexStart, instrHexEnd = int(line1Arr[2],16), int(line1Arr[4], 16)
+            
+            # Get and load instructions
+            instructions = line2.split(".word ")[1].split(", ")
+            self.IMEM = np.array([np.uint32(int(instr,16)) for instr in instructions], dtype=np.uint32)
 
-            pass
+            # Get hex range for data
+            line3Arr = line3.split()
+            dataHexStart, dataHexEnd = int(line3Arr[2], 16), int(line3Arr[4], 16)
 
-        instructions = [
-            0x014B4820, # add $t1 $t2 $t3
-            0x2062FFFF, # addi $v0 $v1 0xffff 
-            0x014B4822 # sub t1 t2 t3
-        ]
-
-        for i in range(len(instructions)):
-            self.IMEM[i] = instructions[i]
+            # Get and load data
+            self.DMEM = np.array([np.uint32(int(data, 16)) for data in line4.split(".word ")[1].split(", ")], dtype=np.uint32)
 
     def pc_idx(self):
         return self.PC >> 2
