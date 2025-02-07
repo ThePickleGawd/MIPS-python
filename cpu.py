@@ -17,6 +17,14 @@ class CPUState():
             # .word [comma separated hex instructions]
             # .data # hexStart hexEnd
             # .word [comma separated hex data]
+            line1 = f.readline()
+            line2 = f.readline()
+            line3 = f.readline()
+            line4 = f.readline()
+
+            line1Arr = line1.split()
+            instrHexStart, instrHexEnd = line1Arr[2], line1Arr[4]
+
             pass
 
         instructions = [
