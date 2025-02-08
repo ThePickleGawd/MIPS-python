@@ -7,43 +7,63 @@ from cpu import cpu
 
 def add(data: InstructionData):
     # R[rd] = R[rs] + R[rt]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rs"]] + cpu.RF[data["rt"]])
 
 def addu(data: InstructionData):
     # R[rd] = R[rs] + R[rt]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rs"]] + cpu.RF[data["rt"]])
 
 def sub(data: InstructionData):
     # R[rd] = R[rs] - R[rt]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rs"]] - cpu.RF[data["rt"]])
 
 def subu(data: InstructionData):
     # R[rd] = R[rs] - R[rt]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rs"]] - cpu.RF[data["rt"]])
 
 def and_(data: InstructionData):
     # R[rd] = R[rs] & R[rt]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rs"]] & cpu.RF[data["rt"]])
 
 def or_(data: InstructionData):
     # R[rd] = R[rs] | R[rt]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rs"]] | cpu.RF[data["rt"]])
 
 def xor(data: InstructionData):
     # R[rd] = R[rs] ^ R[rt]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rs"]] ^ cpu.RF[data["rt"]])
     
 def nor(data: InstructionData):
     # R[rd] = ~(R[rs] | R[rt])
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], ~(cpu.RF[data["rs"]] | cpu.RF[data["rt"]]))
 
 def sll(data: InstructionData):
     # R[rd] = R[rt] << shamt
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], cpu.RF[data["rt"]] << data["shamt"])
 
 def srl(data: InstructionData):
     # R[rd] = R[rt] >> shamt
-    # Note: Python does arithmetic shift, so we need to simulat logical shift
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
+    # Note: Python does arithmetic shift, so we need to simulate logical shift
     value = cpu.RF[data["rt"]]
     if value < 0:
         value += 2**32
@@ -51,11 +71,15 @@ def srl(data: InstructionData):
 
 def sra(data: InstructionData):
     # R[rd] = R[rt] >> shamt (preserve original sign)
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], (cpu.RF[data["rt"]] >> data["shamt"]))
 
 
 def slt(data: InstructionData):
     # R[rd] = (R[rs] < R[rt]) ? 1 : 0
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     signed_rs = cpu.RF[data["rs"]].astype(np.int32)
     signed_rt = cpu.RF[data["rt"]].astype(np.int32)
 
@@ -63,13 +87,19 @@ def slt(data: InstructionData):
 
 def sltu(data: InstructionData):
     # R[rd] = (R[rs] < R[rt]) ? 1 : 0
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.set_rf(data["rd"], 1 if (cpu.RF[data["rs"]] < cpu.RF[data["rt"]]) else 0)
 
 def jr(data: InstructionData):
     # PC=R[rs]
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     cpu.PC = cpu.RF[data["rs"]]
 
 def syscall(data): 
+    if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
+
     v0 = cpu.RF[2]
     a0 = cpu.RF[4]
 
@@ -84,6 +114,9 @@ def syscall(data):
             mem_idx = cpu.addr_to_dmem_idx(a0)
             printStr = ""
             done = False
+            
+            print("Printing at mem_idx", mem_idx, "holding", "0x" + format(cpu.DMEM[mem_idx], "08x"))
+
             while not done and mem_idx < len(cpu.DMEM):
                 word = cpu.DMEM[mem_idx]
                 for i in range(4):
@@ -97,7 +130,7 @@ def syscall(data):
 
                 mem_idx += 1
 
-            print(printStr)
+            print(printStr, end="")
             
             return
 
@@ -114,31 +147,45 @@ def syscall(data):
 
 def addi(data: InstructionData):
     # R[rt] = R[rs] + SignExtImm
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     cpu.set_rf(data["rt"], cpu.RF[data["rs"]] + np.int16(data["immediate"]))
 
 def addiu(data: InstructionData):
     # R[rt] = R[rs] + SignExtImm
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     cpu.set_rf(data["rt"], cpu.RF[data["rs"]] + data["immediate"])
 
 def andi(data: InstructionData):
     # R[rt] = R[rs] & ZeroExtImm
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     cpu.set_rf(data["rt"], cpu.RF[data["rs"]] & data["immediate"])
 
 def ori(data: InstructionData):
     # R[rt] = R[rs] | ZeroExtImm
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     cpu.set_rf(data["rt"], cpu.RF[data["rs"]] | data["immediate"])
 
 def xori(data: InstructionData):
     # R[rt] = R[rs] ^ ZeroExtImm
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     cpu.set_rf(data["rt"], cpu.RF[data["rs"]] ^ data["immediate"])
 
 def lui(data: InstructionData):
     # R[rt] = Immediate << 16
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     cpu.set_rf(data["rt"], data["immediate"] << 16)
 
 
 def beq(data: InstructionData):
     # if(R[rs]==R[rt]) PC=PC+4+BranchAddr
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     # BranchAddr = { 14{immediate[15]}, immediate, 2’b0 }
     if cpu.RF[data["rs"]] == cpu.RF[data["rt"]]:
         signExtended = data["immediate"]
@@ -151,6 +198,8 @@ def beq(data: InstructionData):
 
 def bne(data: InstructionData):
     # if(R[rs]!=R[rt]) PC=PC+4+BranchAddr
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     # BranchAddr = { 14{immediate[15]}, immediate, 2’b0 }
     if cpu.RF[data["rs"]] != cpu.RF[data["rt"]]:
         signExtended = data["immediate"]
@@ -163,16 +212,22 @@ def bne(data: InstructionData):
 
 def slti(data: InstructionData): 
     #  R[rt] = (R[rs] < SignExtImm)? 1 : 0
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     cpu.set_rf(data["rt"], 1 if (cpu.RF[data["rs"]] < np.int32(data["immediate"])) else 0)
 
 def lw(data: InstructionData):
     # R[rt] = M[R[rs]+SignExtImm]
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     RF_rs = cpu.RF[data['rs']]
     signExtImm = np.int32(data["immediate"])
     cpu.set_rf(data["rt"], cpu.DMEM[cpu.addr_to_dmem_idx(RF_rs + signExtImm)])
 
 def sw(data: InstructionData):
     # M[R[rs]+SignExtImm] = R[rt]
+    if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
+
     RF_rs = cpu.RF[data['rs']]
     signExtImm = np.int32(data["immediate"])
     cpu.DMEM[cpu.addr_to_dmem_idx(RF_rs + signExtImm)] = cpu.RF[data["rt"]]
@@ -181,11 +236,15 @@ def sw(data: InstructionData):
 
 def j(data: InstructionData):
     # PC=JumpAddr= { PC+4[31:28], address, 2’b0 }
+    if cpu.verbose: print(OP_TO_J_TYPE[data["opcode"]].__name__)
+
     cpu.PC = (cpu.PC & 0xf0000000) | (data["address"] << 2)
     
 
 def jal(data: InstructionData):
     # R[31]=PC+8;PC=JumpAddr
+    if cpu.verbose: print(OP_TO_J_TYPE[data["opcode"]].__name__)
+
     cpu.RF[31] = cpu.PC + 8
     cpu.PC = data["address"]
 

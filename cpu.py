@@ -13,6 +13,8 @@ class CPUState():
         self.dataHexStart = 0x0
         self.dataHexEnd = 0x0
 
+        self.verbose = True
+
     def load_data(self, file):
         # spim -assemble [file]
 
@@ -61,7 +63,6 @@ class CPUState():
     
     def fetch(self):
         idx = self.pc_idx()
-        print("Fetching", idx)
         instr = self.IMEM[idx]
         self.PC += 4
         return instr
