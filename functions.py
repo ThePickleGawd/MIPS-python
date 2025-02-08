@@ -156,8 +156,9 @@ def sw(data: InstructionData): pass
 # J types
 
 def j(data: InstructionData):
-    # PC=JumpAddr
-    cpu.PC = data["address"]
+    # PC=JumpAddr= { PC+4[31:28], address, 2’b0 }
+    cpu.PC = (cpu.PC & 0xf0000000) | (data["address"] << 2)
+    
 
 def jal(data: InstructionData):
     # R[31]=PC+8;PC=JumpAddr
