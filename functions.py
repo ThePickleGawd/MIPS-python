@@ -80,7 +80,24 @@ def syscall(data):
 
         case 4:
             # Print string
-            # TODO: a0 is the mem addr; string concat until null
+            # Get word from DMEM. Read char one by one until 0x00
+            mem_idx = cpu.addr_to_dmem_idx(a0)
+            printStr = ""
+            done = False
+            while not done and mem_idx < len(cpu.DMEM):
+                word = cpu.DMEM[mem_idx]
+                for i in range(4):
+                    byte = (word >> (i * 8)) & 0xFF  # Extract byte i
+
+                    if byte == 0x00:
+                        done = True
+                        break
+
+                    printStr += chr(byte)
+
+                mem_idx += 1
+
+            print(printStr)
             
             return
 
@@ -149,9 +166,15 @@ def slti(data: InstructionData):
 
 def lw(data: InstructionData):
     # R[rt] = M[R[rs]+SignExtImm]
-    # cpu.RF[data["rt"]] = cpu.DMEM[data["rs"] + ]
+    RF_rs = cpu.RF[data['rs']]
+    signExtImm = np.int32(data["immediate"])
+    cpu.RF[data["rt"]] = cpu.DMEM[cpu.addr_to_dmem_idx(RF_rs + signExtImm)]
 
-def sw(data: InstructionData): pass
+def sw(data: InstructionData):
+    # M[R[rs]+SignExtImm] = R[rt]
+    RF_rs = cpu.RF[data['rs']]
+    signExtImm = np.int32(data["immediate"])
+    cpu.DMEM[cpu.addr_to_dmem_idx(RF_rs + signExtImm)] = cpu.RF[data["rt"]]
 
 # J types
 

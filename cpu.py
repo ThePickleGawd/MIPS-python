@@ -46,6 +46,9 @@ class CPUState():
     def pc_idx(self):
         return (self.PC - self.instrHexStart) >> 2
     
+    def addr_to_dmem_idx(self, addr):
+        return (addr - self.dataHexStart) >> 2
+    
     def finished(self):
         return self.pc_idx() >= len(self.IMEM)
     
