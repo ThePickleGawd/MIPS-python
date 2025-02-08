@@ -49,11 +49,19 @@ class CPUState():
     def addr_to_dmem_idx(self, addr):
         return (addr - self.dataHexStart) >> 2
     
+    def set_rf(self, idx, val):
+        if idx == 0:
+            print("Error: Can't write into $zero")
+            return
+        
+        self.RF[idx] = val
+    
     def finished(self):
         return self.pc_idx() >= len(self.IMEM)
     
     def fetch(self):
         idx = self.pc_idx()
+        print("Fetching", idx)
         instr = self.IMEM[idx]
         self.PC += 4
         return instr

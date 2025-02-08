@@ -31,3 +31,5 @@ while not cpu.finished():
 
     # Execute
     execute(data=data)
+
+print(cpu.RF[12:16])

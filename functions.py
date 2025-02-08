@@ -7,61 +7,63 @@ from cpu import cpu
 
 def add(data: InstructionData):
     # R[rd] = R[rs] + R[rt]
-    # TODO: Trap on overflow?? (Check if negative or positive overflow)
-    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] + cpu.RF[data["rt"]]
+    cpu.set_rf(data["rd"], cpu.RF[data["rs"]] + cpu.RF[data["rt"]])
 
 def addu(data: InstructionData):
     # R[rd] = R[rs] + R[rt]
-    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] + cpu.RF[data["rt"]]
+    cpu.set_rf(data["rd"], cpu.RF[data["rs"]] + cpu.RF[data["rt"]])
 
 def sub(data: InstructionData):
     # R[rd] = R[rs] - R[rt]
-    # TODO: Trap on overflow??
-    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] - cpu.RF[data["rt"]]
+    cpu.set_rf(data["rd"], cpu.RF[data["rs"]] - cpu.RF[data["rt"]])
 
 def subu(data: InstructionData):
     # R[rd] = R[rs] - R[rt]
-    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] - cpu.RF[data["rt"]]
+    cpu.set_rf(data["rd"], cpu.RF[data["rs"]] - cpu.RF[data["rt"]])
 
 def and_(data: InstructionData):
     # R[rd] = R[rs] & R[rt]
-    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] & cpu.RF[data["rt"]]
+    cpu.set_rf(data["rd"], cpu.RF[data["rs"]] & cpu.RF[data["rt"]])
 
 def or_(data: InstructionData):
     # R[rd] = R[rs] | R[rt]
-    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] | cpu.RF[data["rt"]]
+    cpu.set_rf(data["rd"], cpu.RF[data["rs"]] | cpu.RF[data["rt"]])
 
 def xor(data: InstructionData):
     # R[rd] = R[rs] ^ R[rt]
-    cpu.RF[data["rd"]] = cpu.RF[data["rs"]] ^ cpu.RF[data["rt"]]
+    cpu.set_rf(data["rd"], cpu.RF[data["rs"]] ^ cpu.RF[data["rt"]])
     
 def nor(data: InstructionData):
     # R[rd] = ~(R[rs] | R[rt])
-    cpu.RF[data["rd"]] = ~(cpu.RF[data["rs"]] | cpu.RF[data["rt"]])
+    cpu.set_rf(data["rd"], ~(cpu.RF[data["rs"]] | cpu.RF[data["rt"]]))
 
 def sll(data: InstructionData):
     # R[rd] = R[rt] << shamt
-    cpu.RF[data["rd"]] = cpu.RF[data["rt"]] << data["shamt"]
+    cpu.set_rf(data["rd"], cpu.RF[data["rt"]] << data["shamt"])
 
 def srl(data: InstructionData):
     # R[rd] = R[rt] >> shamt
-    cpu.RF[data["rd"]] = (cpu.RF[data["rt"]] >> data["shamt"])
+    # Note: Python does arithmetic shift, so we need to simulat logical shift
+    value = cpu.RF[data["rt"]]
+    if value < 0:
+        value += 2**32
+    cpu.set_rf(data["rd"], (value >> data["shamt"]))
 
 def sra(data: InstructionData):
-    # R[rd] = R[rt] >> shamt (keep original sign)
-    sign_bit = (cpu.RF[data["rt"]] >> 31) & 1
-    cpu.RF[data["rd"]] = (cpu.RF[data["rt"]] >> data["shamt"]) & (sign_bit << 31)
+    # R[rd] = R[rt] >> shamt (preserve original sign)
+    cpu.set_rf(data["rd"], (cpu.RF[data["rt"]] >> data["shamt"]))
+
 
 def slt(data: InstructionData):
     # R[rd] = (R[rs] < R[rt]) ? 1 : 0
     signed_rs = cpu.RF[data["rs"]].astype(np.int32)
     signed_rt = cpu.RF[data["rt"]].astype(np.int32)
 
-    cpu.RF[data["rd"]] = 1 if (signed_rs < signed_rt) else 0
+    cpu.set_rf(data["rd"], 1 if (signed_rs < signed_rt) else 0)
 
 def sltu(data: InstructionData):
     # R[rd] = (R[rs] < R[rt]) ? 1 : 0
-    cpu.RF[data["rd"]] = 1 if (cpu.RF[data["rs"]] < cpu.RF[data["rt"]]) else 0
+    cpu.set_rf(data["rd"], 1 if (cpu.RF[data["rs"]] < cpu.RF[data["rt"]]) else 0)
 
 def jr(data: InstructionData):
     # PC=R[rs]
@@ -71,8 +73,6 @@ def syscall(data):
     v0 = cpu.RF[2]
     a0 = cpu.RF[4]
 
-    print("SYSCALL:", v0, a0)
-    
     match v0:
         case 1:
             print(a0)
@@ -102,7 +102,7 @@ def syscall(data):
             return
 
         case 5:
-            cpu.RF[2] = input()
+            cpu.RF[2] = int(input())
             return
 
         case 10:
@@ -114,27 +114,27 @@ def syscall(data):
 
 def addi(data: InstructionData):
     # R[rt] = R[rs] + SignExtImm
-    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] + data["immediate"].astype(np.int16)
+    cpu.set_rf(data["rt"], cpu.RF[data["rs"]] + np.int16(data["immediate"]))
 
 def addiu(data: InstructionData):
     # R[rt] = R[rs] + SignExtImm
-    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] + data["immediate"]
+    cpu.set_rf(data["rt"], cpu.RF[data["rs"]] + data["immediate"])
 
 def andi(data: InstructionData):
     # R[rt] = R[rs] & ZeroExtImm
-    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] & data["immediate"]
+    cpu.set_rf(data["rt"], cpu.RF[data["rs"]] & data["immediate"])
 
 def ori(data: InstructionData):
     # R[rt] = R[rs] | ZeroExtImm
-    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] | data["immediate"]
+    cpu.set_rf(data["rt"], cpu.RF[data["rs"]] | data["immediate"])
 
 def xori(data: InstructionData):
     # R[rt] = R[rs] ^ ZeroExtImm
-    cpu.RF[data["rt"]] = cpu.RF[data["rs"]] ^ data["immediate"]
+    cpu.set_rf(data["rt"], cpu.RF[data["rs"]] ^ data["immediate"])
 
 def lui(data: InstructionData):
     # R[rt] = Immediate << 16
-    cpu.RF[data["rt"]] = data["immediate"] << 16
+    cpu.set_rf(data["rt"], data["immediate"] << 16)
 
 
 def beq(data: InstructionData):
@@ -159,16 +159,17 @@ def bne(data: InstructionData):
         
         branchAddr = signExtended << 2
         cpu.PC = cpu.PC + 4 + branchAddr
+        print("Branching to ", cpu.PC, cpu.pc_idx())
 
 def slti(data: InstructionData): 
     #  R[rt] = (R[rs] < SignExtImm)? 1 : 0
-    cpu.RF[data["rt"]] = 1 if (cpu.RF[data["rs"]] < np.int32(data["immediate"])) else 0
+    cpu.set_rf(data["rt"], 1 if (cpu.RF[data["rs"]] < np.int32(data["immediate"])) else 0)
 
 def lw(data: InstructionData):
     # R[rt] = M[R[rs]+SignExtImm]
     RF_rs = cpu.RF[data['rs']]
     signExtImm = np.int32(data["immediate"])
-    cpu.RF[data["rt"]] = cpu.DMEM[cpu.addr_to_dmem_idx(RF_rs + signExtImm)]
+    cpu.set_rf(data["rt"], cpu.DMEM[cpu.addr_to_dmem_idx(RF_rs + signExtImm)])
 
 def sw(data: InstructionData):
     # M[R[rs]+SignExtImm] = R[rt]
