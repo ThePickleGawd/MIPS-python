@@ -120,13 +120,36 @@ def lui(data: InstructionData):
     cpu.RF[data["rt"]] = data["immediate"] << 16
 
 
-def beq(data: InstructionData): pass
+def beq(data: InstructionData):
+    # if(R[rs]==R[rt]) PC=PC+4+BranchAddr
+    # BranchAddr = { 14{immediate[15]}, immediate, 2’b0 }
+    if cpu.RF[data["rs"]] == cpu.RF[data["rt"]]:
+        signExtended = data["immediate"]
+        if data["immediate"] & (1 << 15):
+            signExtended = (data["immediate"] | 0xFFFF000)
+        
+        branchAddr = signExtended << 2
+        cpu.PC = cpu.PC + 4 + branchAddr
+        
 
-def bne(data: InstructionData): pass
+def bne(data: InstructionData):
+    # if(R[rs]!=R[rt]) PC=PC+4+BranchAddr
+    # BranchAddr = { 14{immediate[15]}, immediate, 2’b0 }
+    if cpu.RF[data["rs"]] != cpu.RF[data["rt"]]:
+        signExtended = data["immediate"]
+        if data["immediate"] & (1 << 15):
+            signExtended = (data["immediate"] | 0xFFFF000)
+        
+        branchAddr = signExtended << 2
+        cpu.PC = cpu.PC + 4 + branchAddr
 
-def slti(data: InstructionData): pass
+def slti(data: InstructionData): 
+    #  R[rt] = (R[rs] < SignExtImm)? 1 : 0
+    cpu.RF[data["rt"]] = 1 if (cpu.RF[data["rs"]] < np.int32(data["immediate"])) else 0
 
-def lw(data: InstructionData): pass
+def lw(data: InstructionData):
+    # R[rt] = M[R[rs]+SignExtImm]
+    # cpu.RF[data["rt"]] = cpu.DMEM[data["rs"] + ]
 
 def sw(data: InstructionData): pass
 
