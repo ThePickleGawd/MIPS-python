@@ -63,11 +63,15 @@ def sltu(data: InstructionData):
     # R[rd] = (R[rs] < R[rt]) ? 1 : 0
     cpu.RF[data["rd"]] = 1 if (cpu.RF[data["rs"]] < cpu.RF[data["rt"]]) else 0
 
-def jr(data: InstructionData): pass
+def jr(data: InstructionData):
+    # PC=R[rs]
+    cpu.PC = cpu.RF[data["rs"]]
 
 def syscall(data): 
     v0 = cpu.RF[2]
     a0 = cpu.RF[4]
+
+    print("SYSCALL:", v0, a0)
     
     match v0:
         case 1:
@@ -77,6 +81,7 @@ def syscall(data):
         case 4:
             # Print string
             # TODO: a0 is the mem addr; string concat until null
+            
             return
 
         case 5:
@@ -110,6 +115,11 @@ def xori(data: InstructionData):
     # R[rt] = R[rs] ^ ZeroExtImm
     cpu.RF[data["rt"]] = cpu.RF[data["rs"]] ^ data["immediate"]
 
+def lui(data: InstructionData):
+    # R[rt] = Immediate << 16
+    cpu.RF[data["rt"]] = data["immediate"] << 16
+
+
 def beq(data: InstructionData): pass
 
 def bne(data: InstructionData): pass
@@ -119,6 +129,17 @@ def slti(data: InstructionData): pass
 def lw(data: InstructionData): pass
 
 def sw(data: InstructionData): pass
+
+# J types
+
+def j(data: InstructionData):
+    # PC=JumpAddr
+    cpu.PC = data["address"]
+
+def jal(data: InstructionData):
+    # R[31]=PC+8;PC=JumpAddr
+    cpu.RF[31] = cpu.PC + 8
+    cpu.PC = data["address"]
 
 
 FUNCT_TO_R_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {
@@ -150,6 +171,12 @@ OP_TO_I_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {
     0x0b: slti,  # slti
     0x23: lw,    # lw
     0x2b: sw,    # sw
+    0x0f: lui,   # lui
+}
+
+OP_TO_J_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {
+    0x02: j,
+    0x03: jal,
 }
 
 def execute(data: InstructionData):
@@ -158,9 +185,9 @@ def execute(data: InstructionData):
     elif data["instr_type"] == "I":
         OP_TO_I_TYPE[data["opcode"]](data=data)
     else:
-        # TODO: Jump PC to data["immediate"]
+        OP_TO_J_TYPE[data["opcode"]](data=data)
         pass
 
 R_TYPES = ["add", "addu", "sub", "subu", "and", "or", "xor", "nor", "sll", "srl", "sra", "slt", "sltu", "jr"]
 I_TYPES = ["addi", "addiu", "andi", "ori", "xori", "beq", "bne", "slti", "lw", "sw"]
-J_TYPES = ["j"]
+J_TYPES = ["j", "jal"]

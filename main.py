@@ -20,13 +20,14 @@ While PC < len(arr)
 
 """
 
-cpu.load_data("input/simpleAdd.asm.out")
+cpu.load_data("input/minimum.asm.out")
 
 while not cpu.finished():
     # Fetch
     instr = cpu.fetch()
     # Decode
     data = decode(instr=instr)
+    print(format(instr, "08x"))
 
     # Execute
     execute(data=data)
