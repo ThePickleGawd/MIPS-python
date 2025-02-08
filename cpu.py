@@ -8,6 +8,11 @@ class CPUState():
         self.IMEM = np.zeros(0, dtype=np.uint32) # Instruction Memory
         self.DMEM = np.zeros(0, dtype=np.uint32) # Data Memory
 
+        self.instrHexStart = 0x0
+        self.instrHexEnd = 0x0
+        self.dataHexStart = 0x0
+        self.dataHexEnd = 0x0
+
     def load_data(self, file):
         # spim -assemble [file]
 
@@ -24,7 +29,8 @@ class CPUState():
 
             # Get hex range for instructions
             line1Arr = line1.split()
-            instrHexStart, instrHexEnd = int(line1Arr[2],16), int(line1Arr[4], 16)
+            self.instrHexStart, self.instrHexEnd = int(line1Arr[2],16), int(line1Arr[4], 16)
+            self.PC = self.instrHexStart
             
             # Get and load instructions
             instructions = line2.split(".word ")[1].split(", ")
@@ -32,13 +38,13 @@ class CPUState():
 
             # Get hex range for data
             line3Arr = line3.split()
-            dataHexStart, dataHexEnd = int(line3Arr[2], 16), int(line3Arr[4], 16)
+            self.dataHexStart, self.dataHexEnd = int(line3Arr[2], 16), int(line3Arr[4], 16)
 
             # Get and load data
             self.DMEM = np.array([np.uint32(int(data, 16)) for data in line4.split(".word ")[1].split(", ")], dtype=np.uint32)
 
     def pc_idx(self):
-        return self.PC >> 2
+        return (self.PC - self.instrHexStart) >> 2
     
     def finished(self):
         return self.pc_idx() >= len(self.IMEM)
