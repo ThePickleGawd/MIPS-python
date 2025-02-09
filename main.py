@@ -20,14 +20,19 @@ While PC < len(arr)
 
 """
 
-cpu.load_data("input/test_data.asm.out")
+cpu.load_data("input/test_minimum.asm.out")
+cpu.verbose = False
 
-print(len(cpu.DMEM))
 while not cpu.finished():
     # Fetch
     instr = cpu.fetch()
+    # print(format(instr, "08x"))
+
     # Decode
     data = decode(instr=instr)
 
     # Execute
     execute(data=data)
+
+if cpu.verbose:
+    cpu.print_registers()

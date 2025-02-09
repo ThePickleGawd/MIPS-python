@@ -13,7 +13,7 @@ class CPUState():
         self.dataHexStart = 0x0
         self.dataHexEnd = 0x0
 
-        self.verbose = True
+        self.verbose = False
 
     def load_data(self, file):
         # spim -assemble [file]
@@ -52,6 +52,10 @@ class CPUState():
         return (addr - self.dataHexStart) >> 2
     
     def set_rf(self, idx, val):
+        if type(val) != np.uint32:
+            print("Error: Setting register to wrong type")
+            raise TypeError
+
         if idx == 0:
             print("Error: Can't write into $zero")
             return
@@ -64,7 +68,7 @@ class CPUState():
     def fetch(self):
         idx = self.pc_idx()
         instr = self.IMEM[idx]
-        self.PC += 4
+        cpu.PC += 4
         return instr
     
     def print_registers(self):    
@@ -76,7 +80,7 @@ class CPUState():
         ]
 
         for i, name in enumerate(register_names):
-            print(f"{name}: {self.RF[i]}")
+            print(f"{name}: 0x{format(self.RF[i], "08x")}")
 
     
 

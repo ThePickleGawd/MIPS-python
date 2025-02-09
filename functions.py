@@ -1,6 +1,6 @@
 from typing import Callable
 import numpy as np
-from decode import InstructionData
+from decode import InstructionData, print_decoded_instr
 from cpu import cpu
 
 # R types
@@ -73,7 +73,7 @@ def sra(data: InstructionData):
     # R[rd] = R[rt] >> shamt (preserve original sign)
     if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
 
-    cpu.set_rf(data["rd"], (cpu.RF[data["rt"]] >> data["shamt"]))
+    cpu.set_rf(data["rd"], (cpu.RF[data["rt"]].astype(np.int32) >> data["shamt"]))
 
 
 def slt(data: InstructionData):
@@ -83,13 +83,13 @@ def slt(data: InstructionData):
     signed_rs = cpu.RF[data["rs"]].astype(np.int32)
     signed_rt = cpu.RF[data["rt"]].astype(np.int32)
 
-    cpu.set_rf(data["rd"], 1 if (signed_rs < signed_rt) else 0)
+    cpu.set_rf(data["rd"], np.uint32(1) if (signed_rs < signed_rt) else np.uint32(0))
 
 def sltu(data: InstructionData):
     # R[rd] = (R[rs] < R[rt]) ? 1 : 0
     if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
 
-    cpu.set_rf(data["rd"], 1 if (cpu.RF[data["rs"]] < cpu.RF[data["rt"]]) else 0)
+    cpu.set_rf(data["rd"], np.uint32(1) if (cpu.RF[data["rs"]] < cpu.RF[data["rt"]]) else np.uint32(0))
 
 def jr(data: InstructionData):
     # PC=R[rs]
@@ -115,20 +115,28 @@ def syscall(data):
             printStr = ""
             done = False
             
-            print("Printing at mem_idx", mem_idx, "holding", "0x" + format(cpu.DMEM[mem_idx], "08x"))
+            # Note: Since apparently data is NOT word aligned, so we run this algo to find where in the word the string starts
+            #   Get starting mem_index and find i=starting byte idx
+            #   Loop from i-4, getting little endian chars
+            #   After loop, set i = 0 and mem_idx += 1
+            #   Continue reading until 0x00
 
+            word_addr_idx = (mem_idx << 2) + cpu.dataHexStart
+            i = (a0 - word_addr_idx)
             while not done and mem_idx < len(cpu.DMEM):
                 word = cpu.DMEM[mem_idx]
-                for i in range(4):
-                    byte = (word >> (i * 8)) & 0xFF  # Extract byte i
+                while i < 4:
+                    byte = (word >> (i * 8)) & 0xFF  # Extract byte i, little endian
 
                     if byte == 0x00:
                         done = True
                         break
 
                     printStr += chr(byte)
+                    i += 1
 
                 mem_idx += 1
+                i = 0
 
             print(printStr, end="")
             
@@ -208,13 +216,13 @@ def bne(data: InstructionData):
         
         branchAddr = signExtended << 2
         cpu.PC = cpu.PC + 4 + branchAddr
-        print("Branching to ", cpu.PC, cpu.pc_idx())
 
 def slti(data: InstructionData): 
     #  R[rt] = (R[rs] < SignExtImm)? 1 : 0
     if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
 
-    cpu.set_rf(data["rt"], 1 if (cpu.RF[data["rs"]] < np.int32(data["immediate"])) else 0)
+    signed_rs = cpu.RF[data["rs"]].astype(np.int32)
+    cpu.set_rf(data["rt"], 1 if (signed_rs < np.int32(data["immediate"])) else 0)
 
 def lw(data: InstructionData):
     # R[rt] = M[R[rs]+SignExtImm]
@@ -246,7 +254,7 @@ def jal(data: InstructionData):
     if cpu.verbose: print(OP_TO_J_TYPE[data["opcode"]].__name__)
 
     cpu.RF[31] = cpu.PC + 8
-    cpu.PC = data["address"]
+    cpu.PC = (cpu.PC & 0xf0000000) | (data["address"] << 2)
 
 
 FUNCT_TO_R_TYPE: dict[np.uint32, Callable[[InstructionData], None]] = {
