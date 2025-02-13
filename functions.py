@@ -197,9 +197,9 @@ def beq(data: InstructionData):
     if cpu.RF[data["rs"]] == cpu.RF[data["rt"]]:
         signExtended = data["immediate"]
         if data["immediate"] & (1 << 15):  # Check if immediate is negative
-            signExtended |= 0xFFFF0000  # Proper sign extension
+            signExtended |= 0xFFFF0000
 
-        branchAddr = signExtended << 2  # Convert word offset to byte offset
+        branchAddr = signExtended << 2
         cpu.PC += branchAddr - 4  # Adjust for fetch() auto-increment
 
 
@@ -210,9 +210,9 @@ def bne(data: InstructionData):
     if cpu.RF[data["rs"]] != cpu.RF[data["rt"]]:
         signExtended = data["immediate"]
         if data["immediate"] & (1 << 15):  # Check if immediate is negative
-            signExtended |= 0xFFFF0000  # Proper sign extension
+            signExtended |= 0xFFFF0000
 
-        branchAddr = signExtended << 2  # Convert word offset to byte offset
+        branchAddr = signExtended << 2
         cpu.PC += branchAddr - 4  # Adjust for fetch() auto-increment
 
 def slti(data: InstructionData): 
@@ -301,6 +301,6 @@ def execute(data: InstructionData):
         OP_TO_J_TYPE[data["opcode"]](data=data)
         pass
 
-R_TYPES = ["add", "addu", "sub", "subu", "and", "or", "xor", "nor", "sll", "srl", "sra", "slt", "sltu", "jr"]
-I_TYPES = ["addi", "addiu", "andi", "ori", "xori", "beq", "bne", "slti", "lw", "sw"]
+R_TYPES = ["add", "addu", "sub", "subu", "and", "or", "xor", "nor", "sll", "srl", "sra", "slt", "sltu", "jr", "syscall"]
+I_TYPES = ["addi", "addiu", "andi", "ori", "xori", "beq", "bne", "slti", "lw", "sw", "lui"]
 J_TYPES = ["j", "jal"]

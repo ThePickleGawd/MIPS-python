@@ -65,6 +65,7 @@ class CPUState():
         
         self.RF[idx] = val
     
+    # As a hack, syscall 10 will redefine finished to return True
     def finished(self):
         return self.pc_idx() >= len(self.IMEM)
     
