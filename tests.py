@@ -167,14 +167,14 @@ def test_beq():
     cpu.RF[8] = 5
     cpu.RF[9] = 5
     functions.beq({"rs": 8, "rt": 9, "immediate": 4})
-    print("BEQ: PASS" if cpu.PC == 20 else "BEQ: FAIL")
+    print("BEQ: PASS" if cpu.PC == 20 - 8 else "BEQ: FAIL")
 
 def test_bne():
     reset_registers()
     cpu.RF[8] = 5
     cpu.RF[9] = 3
     functions.bne({"rs": 8, "rt": 9, "immediate": 4})
-    print("BNE: PASS" if cpu.PC == 20 else "BNE: FAIL")
+    print("BNE: PASS" if cpu.PC == 20 - 8 else "BNE: FAIL")
 
 def test_slti():
     reset_registers()

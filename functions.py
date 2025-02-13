@@ -73,7 +73,7 @@ def sra(data: InstructionData):
     # R[rd] = R[rt] >> shamt (preserve original sign)
     if cpu.verbose: print(FUNCT_TO_R_TYPE[data["funct"]].__name__)
 
-    cpu.set_rf(data["rd"], (cpu.RF[data["rt"]].astype(np.int32) >> data["shamt"]))
+    cpu.set_rf(data["rd"], np.uint32(cpu.RF[data["rt"]].astype(np.int32) >> data["shamt"]))
 
 
 def slt(data: InstructionData):
@@ -157,7 +157,7 @@ def addi(data: InstructionData):
     # R[rt] = R[rs] + SignExtImm
     if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
 
-    cpu.set_rf(data["rt"], cpu.RF[data["rs"]] + np.int16(data["immediate"]))
+    cpu.set_rf(data["rt"], np.uint32(cpu.RF[data["rs"]] + np.int16(data["immediate"])))
 
 def addiu(data: InstructionData):
     # R[rt] = R[rs] + SignExtImm
@@ -187,42 +187,40 @@ def lui(data: InstructionData):
     # R[rt] = Immediate << 16
     if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
 
-    cpu.set_rf(data["rt"], data["immediate"] << 16)
+    cpu.set_rf(data["rt"], np.uint32(data["immediate"] << 16))
 
 
 def beq(data: InstructionData):
-    # if(R[rs]==R[rt]) PC=PC+4+BranchAddr
+    # if(R[rs] == R[rt]) PC = PC + 4 + BranchAddr
     if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
 
-    # BranchAddr = { 14{immediate[15]}, immediate, 2’b0 }
     if cpu.RF[data["rs"]] == cpu.RF[data["rt"]]:
         signExtended = data["immediate"]
-        if data["immediate"] & (1 << 15):
-            signExtended = (data["immediate"] | 0xFFFF000)
-        
-        branchAddr = signExtended << 2
-        cpu.PC = cpu.PC + 4 + branchAddr
-        
+        if data["immediate"] & (1 << 15):  # Check if immediate is negative
+            signExtended |= 0xFFFF0000  # Proper sign extension
+
+        branchAddr = signExtended << 2  # Convert word offset to byte offset
+        cpu.PC += branchAddr - 4  # Adjust for fetch() auto-increment
+
 
 def bne(data: InstructionData):
-    # if(R[rs]!=R[rt]) PC=PC+4+BranchAddr
+    # if(R[rs] != R[rt]) PC = PC + 4 + BranchAddr
     if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
 
-    # BranchAddr = { 14{immediate[15]}, immediate, 2’b0 }
     if cpu.RF[data["rs"]] != cpu.RF[data["rt"]]:
         signExtended = data["immediate"]
-        if data["immediate"] & (1 << 15):
-            signExtended = (data["immediate"] | 0xFFFF000)
-        
-        branchAddr = signExtended << 2
-        cpu.PC = cpu.PC + 4 + branchAddr
+        if data["immediate"] & (1 << 15):  # Check if immediate is negative
+            signExtended |= 0xFFFF0000  # Proper sign extension
+
+        branchAddr = signExtended << 2  # Convert word offset to byte offset
+        cpu.PC += branchAddr - 4  # Adjust for fetch() auto-increment
 
 def slti(data: InstructionData): 
     #  R[rt] = (R[rs] < SignExtImm)? 1 : 0
     if cpu.verbose: print(OP_TO_I_TYPE[data["opcode"]].__name__)
 
     signed_rs = cpu.RF[data["rs"]].astype(np.int32)
-    cpu.set_rf(data["rt"], 1 if (signed_rs < np.int32(data["immediate"])) else 0)
+    cpu.set_rf(data["rt"], np.uint32(1) if (signed_rs < np.int32(data["immediate"])) else np.uint32(0))
 
 def lw(data: InstructionData):
     # R[rt] = M[R[rs]+SignExtImm]

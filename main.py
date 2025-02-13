@@ -21,7 +21,7 @@ While PC < len(arr)
 """
 
 cpu.load_data("input/test_minimum.asm.out")
-cpu.verbose = False
+cpu.verbose = True
 
 while not cpu.finished():
     # Fetch

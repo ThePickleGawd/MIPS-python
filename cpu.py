@@ -31,7 +31,7 @@ class CPUState():
 
             # Get hex range for instructions
             line1Arr = line1.split()
-            self.instrHexStart, self.instrHexEnd = int(line1Arr[2],16), int(line1Arr[4], 16)
+            self.instrHexStart, self.instrHexEnd = np.uint32(int(line1Arr[2],16)), np.uint32(int(line1Arr[4], 16))
             self.PC = self.instrHexStart
             
             # Get and load instructions
@@ -40,7 +40,7 @@ class CPUState():
 
             # Get hex range for data
             line3Arr = line3.split()
-            self.dataHexStart, self.dataHexEnd = int(line3Arr[2], 16), int(line3Arr[4], 16)
+            self.dataHexStart, self.dataHexEnd = np.uint32(int(line3Arr[2], 16)), np.uint32(int(line3Arr[4], 16))
 
             # Get and load data
             self.DMEM = np.array([np.uint32(int(data, 16)) for data in line4.split(".word ")[1].split(", ")], dtype=np.uint32)
@@ -52,8 +52,11 @@ class CPUState():
         return (addr - self.dataHexStart) >> 2
     
     def set_rf(self, idx, val):
+        if type(val) == np.int32:
+            val = np.uint32(val)
+
         if type(val) != np.uint32:
-            print("Error: Setting register to wrong type")
+            print(f"Error: Setting register {idx} to wrong type", type(val))
             raise TypeError
 
         if idx == 0:
