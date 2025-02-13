@@ -37,3 +37,9 @@ To execute a MIPS program:
    ```bash
    python main.py
    ```
+
+## Tests
+
+```bash
+python tests.py
+```

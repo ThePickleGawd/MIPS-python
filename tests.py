@@ -35,13 +35,6 @@ def test_decode():
     print("====== j =====")
     print_decoded_instr(data=jump_data)
 
-def test_add():
-    cpu.RF[7] = 0x00000000
-    cpu.RF[8] = 0xFFFFFFFF
-    cpu.RF[9] = 0x00000003
-    functions.add({"rd": 7, "rs": 8, "rt": 9})
-    print(format(cpu.RF[7], "08x"))
-
 # Helper to reset registers before each test
 def reset_registers():
     cpu.RF = np.zeros(32, dtype=np.uint32)
@@ -227,6 +220,7 @@ def test_jal():
 
 # Run all tests
 def run_all():
+    test_decode()
     test_add()
     test_addu()
     test_sub()
