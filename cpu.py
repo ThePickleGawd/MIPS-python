@@ -8,10 +8,10 @@ class CPUState():
         self.IMEM = np.zeros(0, dtype=np.uint32) # Instruction Memory
         self.DMEM = np.zeros(0, dtype=np.uint32) # Data Memory
 
-        self.instrHexStart = 0x0
-        self.instrHexEnd = 0x0
-        self.dataHexStart = 0x0
-        self.dataHexEnd = 0x0
+        self.instrHexStart = np.uint32(0x0)
+        self.instrHexEnd = np.uint32(0x0)
+        self.dataHexStart = np.uint32(0x0)
+        self.dataHexEnd = np.uint32(0x0)
 
         self.verbose = False
 
